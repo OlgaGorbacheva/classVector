@@ -72,7 +72,7 @@ public:
         delete[] Pointer;
         Pointer = BufPointer;
         MemorySize = _vector.MemorySize;
-        VectorSize = _vector.VectorSize;
+        VectorSize = _vector.VectorSize;-build-desktop-Qt_4_8_1___PATH____________________
         for (unsigned int i = 0; i < VectorSize; i++){
             new (Pointer + i) UsingType();
             Pointer[i] = _vector[i];
@@ -91,13 +91,15 @@ public:
 
     UsingType & operator[](int const k)
     {
-        if (k > VectorSize){
+        if (k < 0)
+            throw "Unacceptable index";
+        if ((unsigned)k >= VectorSize){
             while (k * sizeof(UsingType) >= MemorySize){
                 if (MemoryGrow())
                     abort();
             }
-            for (int i = VectorSize; i < k; i++){
-                new (Pointer + i) UsingType();
+            for (;VectorSize <= (unsigned)k; VectorSize++){
+                new (Pointer + VectorSize) UsingType();
             }
         }
         UsingType & Obj = Pointer[k];
