@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <iostream>
+#include <stdlib.h>
 #define MIN_MEMORY_SIZE 200
 //#define UsingType int
 
@@ -19,14 +20,13 @@ class my::vector
 {
 private:
     unsigned int VectorSize; //number of elements
-    int const SizeType; //size of type
     unsigned int MemorySize; //number of bytes allocated from heap
-    void* Pointer;  //pointer to begin of vector
+    UsingType* Pointer;  //pointer to begin of vector
     int MemoryGrow() //to reallocate memory
     {
-        void* BufPointer;
+        UsingType* BufPointer;
         try{
-            BufPointer = (void*) new char[MemorySize * 2];
+            BufPointer = (UsingType*) new char[MemorySize * 2];
         }
         catch(...){
             cerr << "Memory allocation error" << endl;
@@ -39,27 +39,24 @@ private:
     }
 public:
     explicit vector(): VectorSize(0),
-                       SizeType(sizeof(UsingType)),
-                       MemorySize(MIN_MEMORY_SIZE * SizeType)
+                       MemorySize(MIN_MEMORY_SIZE * sizeof(UsingType))
     {
-        Pointer = (void*) new char[MemorySize];
+        Pointer = (UsingType*) new char[MemorySize];
     }
 
     explicit vector(unsigned int _MemorySize): VectorSize(0),
-                                               SizeType(sizeof(UsingType)),
-                                               MemorySize(_MemorySize * SizeType)
+                                               MemorySize(_MemorySize * sizeof(UsingType))
     {
-        Pointer = (void*) new char[MemorySize];
+        Pointer = (UsingType*) new char[MemorySize];
     }
 
     explicit vector(my::vector<UsingType> const & _vector): VectorSize(_vector.VectorSize),
-                                                            MemorySize(_vector.MemorySize),
-                                                            SizeType(sizeof(UsingType))
+                                                            MemorySize(_vector.MemorySize)
     {
-        Pointer = (void*) new char[MemorySize];
-        for (int i = 0; i < VectorSize; i++){
-            new ((char*)Pointer + i * SizeType) UsingType();
-            this[i] = _vector[i];
+        Pointer = (UsingType*) new char[MemorySize];
+        for (unsigned int i = 0; i < VectorSize; i++){
+            new (Pointer + i) UsingType();
+            Pointer[i] = _vector[i];
         }
     }
 
@@ -70,56 +67,41 @@ public:
 
     void operator=(my::vector<UsingType> const & _vector)
     {
-        void* BufPointer;
-        BufPointer = (void*) new char[_vector.MemorySize];
+        UsingType* BufPointer;
+        BufPointer = (UsingType*) new char[_vector.MemorySize];
         delete[] Pointer;
         Pointer = BufPointer;
         MemorySize = _vector.MemorySize;
         VectorSize = _vector.VectorSize;
-        for (int i = 0; i < VectorSize; i++){
-            new ((char*)Pointer + i * SizeType) UsingType();
-            this[i] = _vector[i];
+        for (unsigned int i = 0; i < VectorSize; i++){
+            new (Pointer + i) UsingType();
+            Pointer[i] = _vector[i];
         }
     }
 
     UsingType const & operator[](int const k) const
     {
-        if (k <= VectorSize)
-            ;
-        else{
-            if ((k + 1) * SizeType < MemorySize){
-                for (int i = VectorSize; i < k; i++){
-                    new ((char*)Pointer + i * SizeType) UsingType();
-                }
-            }
-            else{
-                while (k * SizeType >= MemorySize){
-                    if (MemoryGrow())
-                        return NULL;
-                }
-            }
-        }
-        return (UsingType const) *((char*)Pointer + k * SizeType);
+        if (k < 0)
+            throw "Unacceptable index";
+        if ((unsigned int)k > VectorSize)
+            throw "Unacceptable index";
+        UsingType const & Obj = Pointer[k];
+        return Obj;
     }
 
     UsingType & operator[](int const k)
     {
-        if (k <= VectorSize)
-            ;
-        else{
-            if ((k + 1) * SizeType < MemorySize){
-                for (int i = VectorSize; i < k; i++){
-                    new ((char*)Pointer + i * SizeType) UsingType();
-                }
+        if (k > VectorSize){
+            while (k * sizeof(UsingType) >= MemorySize){
+                if (MemoryGrow())
+                    abort();
             }
-            else{
-                while (k * SizeType >= MemorySize){
-                    if (MemoryGrow())
-                        return NULL;
-                }
+            for (int i = VectorSize; i < k; i++){
+                new (Pointer + i) UsingType();
             }
         }
-        return (UsingType) *((char*)Pointer + k * SizeType);;
+        UsingType & Obj = Pointer[k];
+        return Obj;
     }
 //    //    void PushBack(Point);
 //    //    int GetSize();
