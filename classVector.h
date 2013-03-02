@@ -72,7 +72,7 @@ public:
         delete[] Pointer;
         Pointer = BufPointer;
         MemorySize = _vector.MemorySize;
-        VectorSize = _vector.VectorSize;-build-desktop-Qt_4_8_1___PATH____________________
+        VectorSize = _vector.VectorSize;
         for (unsigned int i = 0; i < VectorSize; i++){
             new (Pointer + i) UsingType();
             Pointer[i] = _vector[i];
@@ -105,8 +105,20 @@ public:
         UsingType & Obj = Pointer[k];
         return Obj;
     }
-//    //    void PushBack(Point);
-//    //    int GetSize();
+
+    void PushBack(UsingType elem)
+    {
+        VectorSize++;
+        if (VectorSize * sizeof(UsingType) > MemorySize)
+            if (MemoryGrow())
+                abort();
+        Pointer[VectorSize] = elem;
+    }
+
+    int GetSize()
+    {
+        return VectorSize;
+    }
 };
 
 #endif // CLASSVECTOR_H
