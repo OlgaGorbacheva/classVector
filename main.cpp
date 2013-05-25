@@ -18,6 +18,11 @@ int main()
     k.PushBack(true);
     cout << endl;
     for (int i = 0; i < k.GetSize(); i++)
-        cout << k[i] << endl;
+        cout << k[i];
+    k[0] = true;
+    k[2] = false;
+    cout << endl;
+    for (int i = 0; i < k.GetSize(); i++)
+        cout << k[i];
     return 0;
 }

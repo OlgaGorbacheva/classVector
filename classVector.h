@@ -44,16 +44,30 @@ private:
     unsigned int MemorySize; //number of bytes allocated from heap
     char* Pointer;  //pointer to begin of vector
     void MemoryGrow(); //to reallocate memory
+    class ToElem;
 public:
     explicit vector();
     explicit vector(unsigned int); //creat a vector with specified initial MemorySize
     explicit vector(my::vector<bool> const & ); // copy a vector
     ~vector();
     void operator=(my::vector<bool> const &);
-    bool const & operator[](unsigned int const) const;
-    //bool & operator[](unsigned int const);
+    bool const operator[](unsigned int const) const;
+    my::vector<bool>::ToElem operator[](unsigned int const);
     void PushBack(bool);
     int GetSize();
+};
+
+class my::vector<bool>::ToElem
+{
+private:
+    unsigned int const pos;
+    unsigned char mask1;
+    unsigned char mask0;
+    char *pointer;
+public:
+    ToElem(unsigned int const _pos, char *_pointer);
+    void operator =(bool _val);
+    operator bool() const;
 };
 
 #include "classVector.cpp"

@@ -156,39 +156,34 @@ void my::vector<bool>::operator=(my::vector<bool> const & _vector)
     }
 }
 
-bool const & my::vector<bool>::operator[](unsigned int const k) const
+bool const my::vector<bool>::operator[](unsigned int const k) const
 {
     if (k >= VectorSize)
         throw "Unexpectable index";
     unsigned char mask = 1 << (7 - k % 8);
-    bool const &ret = Pointer[k / 8] & mask ? 1 : 0;
-   // cout <<( Pointer[k / 8] & mask ? 1 : 0) << endl;
+    bool const ret = Pointer[k / 8] & mask ? true : false;
+//    cout <<ret;
     return  ret;
 }
 
-//template <>
-//bool & my::vector<bool>::operator[](unsigned int const k)
-//{
-//    if (k >= VectorSize){
-//            while (k / 8 >= MemorySize)
-//                MemoryGrow();
-//        for (;VectorSize <= k; VectorSize++){
-//            new ((UsingType*)Pointer + VectorSize) UsingType();
-//        }
-//    }
-//    UsingType & Obj = *((UsingType*)Pointer + k);
-//    return Obj;
-//}
+my::vector<bool>::ToElem my::vector<bool>::operator[](unsigned int const k)
+{
+    if (k >= VectorSize)
+        throw "Unexpectable index";
+    my::vector<bool>::ToElem result(k, Pointer);
+    return result;
+}
 
 void my::vector<bool>::PushBack(bool elem)
 {
-    VectorSize++;
     if (VectorSize / 8 > MemorySize){
         MemoryGrow();
     }
     unsigned char mask = 1 << (7 - VectorSize % 8);
     if (elem == true)
         Pointer[VectorSize / 8] = Pointer[VectorSize / 8] | mask;
+
+    VectorSize++;
 }
 
 int my::vector<bool>::GetSize()
@@ -196,6 +191,22 @@ int my::vector<bool>::GetSize()
     return VectorSize;
 }
 
+my::vector<bool>::ToElem::ToElem(unsigned int const _pos, char *_pointer):pos(_pos), pointer(_pointer)
+{
+    mask1 = 1 << (7 - pos % 8);
+    mask0 = ~mask1;
+}
 
+void my::vector<bool>::ToElem::operator =(bool _val)
+{
+    if (_val)
+        pointer[pos / 8] = pointer[pos / 8] | mask1;
+    else pointer[pos / 8] = pointer[pos / 8] & mask0;
+}
+
+my::vector<bool>::ToElem::operator bool() const
+{
+    return (pointer[pos / 8] & mask1) ? true : false;
+}
 
 #endif //CLASSVECTOR_HPP
